@@ -29,11 +29,11 @@ export function getNativeEventLogs() {
 export function getErrorLogs() {
   return errorLogs;
 }
-export function addConsoleLogs(log: any) {
-  if (consoleLogs.length > config.cacheLogMaxCount) {
-    consoleLogs.shift();
+export function addNativeEventLogs(log: any) {
+  if (nativeEventLogs.length > config.cacheLogMaxCount) {
+    nativeEventLogs.shift();
   }
-  consoleLogs.push(log);
+  nativeEventLogs.push(log);
 }
 export function addErrorLogs(err: any) {
   if (err?.length) {
@@ -60,11 +60,14 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     key: `sendNativeEvent:${eventName}`,
     params,
     response: '',
+    startTime: Date.now(),
+    endTime: 0,
   };
-  nativeEventLogs.push(data);
+  addNativeEventLogs(data);
   nativeEventSubject.next(nativeEventLogs);
   originalUniSendEvent(eventName, params, (...params: any[]) => {
     data.response = params?.[0] ?? '';
+    data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
     callback(...params);
   });
@@ -74,13 +77,17 @@ const originalUniOnEvent = uni.onNativeEventReceive;
 uni.onNativeEventReceive = (callback) => {
   // #ifndef H5
   originalUniOnEvent((event, data) => {
-    nativeEventLogs.push({
+    const log = {
       key: `onNativeEvent:${event}`,
       response: data,
       params: '',
-    });
-    nativeEventSubject.next(nativeEventLogs);
+      startTime: Date.now(),
+      endTime: 0,
+    };
+    addNativeEventLogs(log);
     callback?.(event, data);
+    log.endTime = Date.now();
+    nativeEventSubject.next(nativeEventLogs);
   });
   // #endif
 };
@@ -102,12 +109,15 @@ Object.defineProperty(uni, 'request', {
     const onceReqResult = {
       request: requestParams,
       response: null,
+      startTime: Date.now(),
+      endTime: 0,
     };
     networkLogs.push(onceReqResult);
     networkSubject.next(networkLogs);
     const { complete: originalCompleteMethod } = requestParams;
     requestParams.complete = function (...resParams: any[]) {
       onceReqResult.response = resParams?.[0];
+      onceReqResult.endTime = Date.now();
       networkSubject.next(networkLogs);
       if (typeof originalCompleteMethod === 'function') {
         return originalCompleteMethod.apply(this, resParams);
