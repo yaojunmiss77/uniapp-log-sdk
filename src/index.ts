@@ -1,4 +1,5 @@
 import { Subject } from 'rxjs';
+import { IOptions } from './interface';
 
 const config: IOptions = {
   cacheLogMaxCount: 50,
