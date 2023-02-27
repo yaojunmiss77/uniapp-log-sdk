@@ -1,6 +1,6 @@
 {
   "name": "uniapp-log-sdk",
-  "version": "1.1.0",
+  "version": "1.1.1",
   "description": "用于收取uniapp日志的sdk",
   "main": "dist/index.umd.mini.js",
   "typings": "dist/index.d.ts",
