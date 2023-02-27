@@ -11,4 +11,10 @@ export declare function getConsoleLogs(): any[];
 export declare function getNetworkLogs(): any[];
 export declare function getNativeEventLogs(): any[];
 export declare function getErrorLogs(): any[];
+export declare function addNativeEventLogs(log: any): void;
 export declare function addErrorLogs(err: any): void;
+export declare function addNetworkLog(log: any): void;
+declare const _default: {
+    install(options: Partial<IOptions>): void;
+};
+export default _default;
