@@ -1,27 +1,37 @@
-import { consoleSubject, errorSubject, nativeEventSubject, networkSubject } from './probe';
+import { consoleSubjectOnce, errorSubject, nativeEventResponseSubjectOnce, networkResponseSubjectOnce } from './probe';
 
 interface IReportConfig {
   reportEventName: string;
 }
-
 /** 日志类型 */
-type LogType = 'http' | 'console' | 'event' | 'exception' | 'custom';
+enum LogType {
+  HTTP = 'http',
+  CONSOLE = 'console',
+  EVENT = 'event',
+  ERROR = 'error',
+  CUSTOM = 'custom',
+}
 
 const REPORT_CONFIG: IReportConfig = {
   /** 上报事件名称 */
   reportEventName: 'monitorReport',
 };
 
-const sendSubjectData = (data: any[]) => {
-  sendData('console', [...(data ?? [])]?.pop?.() ?? '');
-};
-
 /** console上报 */
-consoleSubject.subscribe(sendSubjectData);
-errorSubject.subscribe(sendSubjectData);
-nativeEventSubject.subscribe(sendSubjectData);
-networkSubject.subscribe((data: any[]) => {
-  console.log(333333333, data);
+consoleSubjectOnce.subscribe((data) => {
+  sendData(LogType.CONSOLE, data);
+});
+errorSubject.subscribe((data) => {
+  sendData(LogType.ERROR, data);
+});
+nativeEventResponseSubjectOnce.subscribe((data) => {
+  sendData(LogType.EVENT, data);
+});
+networkResponseSubjectOnce.subscribe((data: any) => {
+  /** 当有响应后，且响应的errno不是0，则上报日志 */
+  if (data?.response && data.response.data?.errno !== 0) {
+    sendData(LogType.HTTP, data);
+  }
 });
 
 /**
@@ -29,7 +39,7 @@ networkSubject.subscribe((data: any[]) => {
  * @param data
  */
 export function reportLog(data: any) {
-  sendData('custom', data);
+  sendData(LogType.CUSTOM, data);
 }
 
 /**

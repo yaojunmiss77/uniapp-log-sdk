@@ -10,6 +10,11 @@ export const errorSubject = new Subject<any[]>();
 export const networkSubject = new Subject<any[]>();
 export const nativeEventSubject = new Subject<any[]>();
 
+export const consoleSubjectOnce = new Subject<any>();
+export const errorSubjectOnce = new Subject<any>();
+export const networkResponseSubjectOnce = new Subject<any>();
+export const nativeEventResponseSubjectOnce = new Subject<any>();
+
 const consoleLogs: any[] = [];
 const networkLogs: any[] = [];
 const nativeEventLogs: any[] = [];
@@ -40,6 +45,7 @@ export function addErrorLogs(err: any) {
   if (err?.length) {
     errorLogs.push(err);
     errorSubject.next(errorLogs);
+    errorSubjectOnce.next(err);
   }
 }
 export function addNetworkLog(log: any) {
@@ -70,6 +76,7 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
+    nativeEventResponseSubjectOnce.next(data);
     callback(...params);
   });
   // #endif
@@ -86,6 +93,7 @@ uni.onNativeEventReceive = (callback) => {
       endTime: 0,
     };
     addNativeEventLogs(log);
+    nativeEventResponseSubjectOnce.next(log);
     callback?.(event, data);
     log.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
@@ -98,6 +106,7 @@ const originalConsoleLog = console.log;
 console.log = (...params) => {
   consoleLogs.push(params);
   consoleSubject.next(consoleLogs);
+  consoleSubjectOnce.next(params);
   originalConsoleLog(...params);
 };
 // #endif
@@ -120,6 +129,7 @@ Object.defineProperty(uni, 'request', {
       onceReqResult.response = resParams?.[0];
       onceReqResult.endTime = Date.now();
       networkSubject.next(networkLogs);
+      networkResponseSubjectOnce.next(onceReqResult);
       if (typeof originalCompleteMethod === 'function') {
         return originalCompleteMethod.apply(this, resParams);
       }
