@@ -5,15 +5,17 @@ const config: IOptions = {
   cacheLogMaxCount: 50,
 };
 
+/** 对应多值 */
 export const consoleSubject = new Subject<any[]>();
 export const errorSubject = new Subject<any[]>();
 export const networkSubject = new Subject<any[]>();
 export const nativeEventSubject = new Subject<any[]>();
 
-export const consoleSubjectOnce = new Subject<any>();
-export const errorSubjectOnce = new Subject<any>();
-export const networkResponseSubjectOnce = new Subject<any>();
-export const nativeEventResponseSubjectOnce = new Subject<any>();
+/** 对应单值 */
+export const consoleBroadcast = new Subject<any>();
+export const errorBroadcast = new Subject<any>();
+export const networkResponseBroadcast = new Subject<any>();
+export const nativeEventResponseBroadcast = new Subject<any>();
 
 const consoleLogs: any[] = [];
 const networkLogs: any[] = [];
@@ -45,7 +47,7 @@ export function addErrorLogs(err: any) {
   if (err?.length) {
     errorLogs.push(err);
     errorSubject.next(errorLogs);
-    errorSubjectOnce.next(err);
+    errorBroadcast.next(err);
   }
 }
 export function addNetworkLog(log: any) {
@@ -76,7 +78,7 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
-    nativeEventResponseSubjectOnce.next(data);
+    nativeEventResponseBroadcast.next(data);
     callback(...params);
   });
   // #endif
@@ -93,7 +95,7 @@ uni.onNativeEventReceive = (callback) => {
       endTime: 0,
     };
     addNativeEventLogs(log);
-    nativeEventResponseSubjectOnce.next(log);
+    nativeEventResponseBroadcast.next(log);
     callback?.(event, data);
     log.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
@@ -106,7 +108,7 @@ const originalConsoleLog = console.log;
 console.log = (...params) => {
   consoleLogs.push(params);
   consoleSubject.next(consoleLogs);
-  consoleSubjectOnce.next(params);
+  consoleBroadcast.next(params);
   originalConsoleLog(...params);
 };
 // #endif
@@ -129,7 +131,7 @@ Object.defineProperty(uni, 'request', {
       onceReqResult.response = resParams?.[0];
       onceReqResult.endTime = Date.now();
       networkSubject.next(networkLogs);
-      networkResponseSubjectOnce.next(onceReqResult);
+      networkResponseBroadcast.next(onceReqResult);
       if (typeof originalCompleteMethod === 'function') {
         return originalCompleteMethod.apply(this, resParams);
       }

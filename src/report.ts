@@ -1,4 +1,4 @@
-import { consoleSubjectOnce, errorSubject, nativeEventResponseSubjectOnce, networkResponseSubjectOnce } from './probe';
+import { consoleBroadcast, errorBroadcast, nativeEventResponseBroadcast, networkResponseBroadcast } from './probe';
 
 interface IReportConfig {
   reportEventName: string;
@@ -18,16 +18,16 @@ const REPORT_CONFIG: IReportConfig = {
 };
 
 /** console上报 */
-consoleSubjectOnce.subscribe((data) => {
+consoleBroadcast.subscribe((data) => {
   sendData(LogType.CONSOLE, data);
 });
-errorSubject.subscribe((data) => {
+errorBroadcast.subscribe((data) => {
   sendData(LogType.ERROR, data);
 });
-nativeEventResponseSubjectOnce.subscribe((data) => {
+nativeEventResponseBroadcast.subscribe((data) => {
   sendData(LogType.EVENT, data);
 });
-networkResponseSubjectOnce.subscribe((data: any) => {
+networkResponseBroadcast.subscribe((data: any) => {
   /** 当有响应后，且响应的errno不是0，则上报日志 */
   if (data?.response && data.response.data?.errno !== 0) {
     sendData(LogType.HTTP, data);
