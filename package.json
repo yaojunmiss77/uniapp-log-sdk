@@ -1,6 +1,6 @@
 {
   "name": "uniapp-log-sdk",
-  "version": "1.2.4",
+  "version": "1.2.0",
   "description": "用于收取uniapp日志的sdk",
   "main": "dist/index.esm.js",
   "typings": "dist/index.d.ts",
@@ -12,7 +12,6 @@
     "dev": "rimraf dist typings && tsc --emitDeclarationOnly && cross-env NODE_ENV=development rollup -c --watch",
     "build": "rimraf dist typings && tsc --emitDeclarationOnly && cross-env NODE_ENV=production rollup -c",
     "prepublish": "npm run build",
-    "postinstall": "patch-package",
     "c": "git-cz"
   },
   "author": "yaojun",
