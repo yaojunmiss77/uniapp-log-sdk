@@ -4,6 +4,8 @@ import { IReportConfig } from './interface';
 export * from './probe';
 export * from './report';
 
+console.log(uni.getSystemInfoSync());
+
 export default {
   install(options: Partial<IReportConfig>) {
     if (options.cacheLogMaxCount) {

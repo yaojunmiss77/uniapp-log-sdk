@@ -40,9 +40,13 @@ export function reportLog(data: any) {
  * @param data
  */
 function sendData(type: LogType, data: any) {
+  const { appName, appVersion, appId } = (uni.getSystemInfoSync() as any) ?? {};
   uni.sendNativeEvent(
     REPORT_CONFIG.reportEventName,
     {
+      appName,
+      appVersion,
+      appId,
       logType: type,
       time: Date.now(),
       page: getCurrentPages?.()?.pop?.()?.route ?? '',
