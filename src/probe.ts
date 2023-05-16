@@ -40,7 +40,8 @@ export function addNativeEventLogs(log: any) {
   nativeEventLogs.push(log);
 }
 export function addErrorLogs(err: any) {
-  if (err?.length) {
+  /** 排除错误不明确的 */
+  if (/[a-zA-Z0-9]/.test(JSON.stringify(err))) {
     errorLogs.push(err);
     errorSubject.next(errorLogs);
     errorBroadcast.next(err);
@@ -66,8 +67,8 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
-    /** 对上报事件不进行劫持，防止死循环, 且如果错误不明确，则不广播 */
-    if (REPORT_CONFIG.reportEventName !== eventName && data && /[a-zA-Z0-9]/.test(JSON.stringify(data))) {
+    /** 对上报事件不进行劫持，防止死循环 */
+    if (REPORT_CONFIG.reportEventName !== eventName) {
       nativeEventResponseBroadcast.next(data);
     }
     callback(...params);
