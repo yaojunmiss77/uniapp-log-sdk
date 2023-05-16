@@ -66,7 +66,10 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
-    nativeEventResponseBroadcast.next(data);
+    /** 对上报事件不进行劫持，防止死循环 */
+    if (REPORT_CONFIG.reportEventName !== eventName) {
+      nativeEventResponseBroadcast.next(data);
+    }
     callback(...params);
   });
   // #endif
@@ -83,7 +86,10 @@ uni.onNativeEventReceive = (callback) => {
       endTime: 0,
     };
     addNativeEventLogs(log);
-    nativeEventResponseBroadcast.next(log);
+    /** 对上报事件不进行劫持，防止死循环 */
+    if (REPORT_CONFIG.reportEventName !== event) {
+      nativeEventResponseBroadcast.next(log);
+    }
     callback?.(event, data);
     log.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
