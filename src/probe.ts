@@ -1,9 +1,5 @@
 import { Subject } from 'rxjs';
-import { IOptions } from './interface';
-
-const config: IOptions = {
-  cacheLogMaxCount: 50,
-};
+import { REPORT_CONFIG } from './constant';
 
 /** 对应多值 */
 export const consoleSubject = new Subject<any[]>();
@@ -38,7 +34,7 @@ export function getErrorLogs() {
   return errorLogs;
 }
 export function addNativeEventLogs(log: any) {
-  if (nativeEventLogs.length > config.cacheLogMaxCount) {
+  if (nativeEventLogs.length > REPORT_CONFIG.cacheLogMaxCount) {
     nativeEventLogs.shift();
   }
   nativeEventLogs.push(log);
@@ -53,14 +49,6 @@ export function addErrorLogs(err: any) {
 export function addNetworkLog(log: any) {
   networkLogs.push(log);
 }
-
-export default {
-  install(options: Partial<IOptions>) {
-    if (options.cacheLogMaxCount) {
-      config.cacheLogMaxCount = options.cacheLogMaxCount;
-    }
-  },
-};
 
 const originalUniSendEvent = uni.sendNativeEvent;
 uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) => {
