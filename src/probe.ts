@@ -10,7 +10,9 @@ export const nativeEventSubject = new Subject<any[]>();
 /** 对应单值 */
 export const consoleBroadcast = new Subject<any>();
 export const errorBroadcast = new Subject<any>();
+export const networkRequestBroadcast = new Subject<any>();
 export const networkResponseBroadcast = new Subject<any>();
+export const nativeEventSendBroadcast = new Subject<any>();
 export const nativeEventResponseBroadcast = new Subject<any>();
 
 const consoleLogs: any[] = [];
@@ -63,6 +65,10 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
   };
   addNativeEventLogs(data);
   nativeEventSubject.next(nativeEventLogs);
+  /** 对上报事件不进行劫持，防止死循环 */
+  if (REPORT_CONFIG.reportEventName !== eventName) {
+    nativeEventSendBroadcast.next(data);
+  }
   originalUniSendEvent(eventName, params, (...params: any[]) => {
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
@@ -120,6 +126,7 @@ Object.defineProperty(uni, 'request', {
       endTime: 0,
     };
     networkLogs.push(onceReqResult);
+    networkRequestBroadcast.next(onceReqResult);
     networkSubject.next(networkLogs);
     const { complete: originalCompleteMethod } = requestParams;
     requestParams.complete = function (...resParams: any[]) {

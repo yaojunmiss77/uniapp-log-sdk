@@ -1,5 +1,11 @@
 import { REPORT_CONFIG } from './constant';
-import { consoleBroadcast, errorBroadcast, nativeEventResponseBroadcast, networkResponseBroadcast } from './probe';
+import {
+  consoleBroadcast,
+  errorBroadcast,
+  nativeEventResponseBroadcast,
+  nativeEventSendBroadcast,
+  networkResponseBroadcast,
+} from './probe';
 
 /** 日志类型 */
 enum LogType {
@@ -16,6 +22,9 @@ consoleBroadcast.subscribe((data) => {
 });
 errorBroadcast.subscribe((data) => {
   sendData(LogType.ERROR, data);
+});
+nativeEventSendBroadcast.subscribe((data) => {
+  sendData(LogType.EVENT, data);
 });
 nativeEventResponseBroadcast.subscribe((data) => {
   sendData(LogType.EVENT, data);
