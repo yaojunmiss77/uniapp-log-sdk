@@ -66,8 +66,8 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.response = params?.[0] ?? '';
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
-    /** 对上报事件不进行劫持，防止死循环 */
-    if (REPORT_CONFIG.reportEventName !== eventName) {
+    /** 对上报事件不进行劫持，防止死循环, 且如果错误不明确，则不广播 */
+    if (REPORT_CONFIG.reportEventName !== eventName && data && /[a-zA-Z0-9]/.test(JSON.stringify(data))) {
       nativeEventResponseBroadcast.next(data);
     }
     callback(...params);
