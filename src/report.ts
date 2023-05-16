@@ -1,8 +1,6 @@
+import { REPORT_CONFIG } from './constant';
 import { consoleBroadcast, errorBroadcast, nativeEventResponseBroadcast, networkResponseBroadcast } from './probe';
 
-interface IReportConfig {
-  reportEventName: string;
-}
 /** 日志类型 */
 enum LogType {
   HTTP = 'http',
@@ -11,11 +9,6 @@ enum LogType {
   ERROR = 'error',
   CUSTOM = 'custom',
 }
-
-const REPORT_CONFIG: IReportConfig = {
-  /** 上报事件名称 */
-  reportEventName: 'monitorReport',
-};
 
 /** console上报 */
 consoleBroadcast.subscribe((data) => {
