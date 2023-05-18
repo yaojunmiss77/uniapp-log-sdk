@@ -12,6 +12,7 @@
     "dev": "rimraf dist typings && tsc --emitDeclarationOnly && cross-env NODE_ENV=development rollup -c --watch",
     "build": "rimraf dist typings && tsc --emitDeclarationOnly && cross-env NODE_ENV=production rollup -c",
     "prepublish": "npm run build",
+    "postinstall": "patch-package",
     "c": "git-cz"
   },
   "author": "yaojun",
@@ -29,6 +30,7 @@
     "@rollup/plugin-replace": "^2.4.2",
     "@types/node": "^14.10.1",
     "@types/uni-app": "^1.4.4",
+    "@types/vue": "^2.0.0",
     "@typescript-eslint/parser": "^5.54.1",
     "commitizen": "^4.2.3",
     "cross-env": "^7.0.2",
