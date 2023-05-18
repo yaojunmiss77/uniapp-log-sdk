@@ -12,5 +12,8 @@ export default {
     if (options.reportEventName) {
       REPORT_CONFIG.reportEventName = options.reportEventName;
     }
+    if (options.whiteEventNames?.length) {
+      REPORT_CONFIG.whiteEventNames = options.whiteEventNames;
+    }
   },
 };
