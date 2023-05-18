@@ -19,6 +19,11 @@ const consoleLogs: any[] = [];
 const networkLogs: any[] = [];
 const nativeEventLogs: any[] = [];
 const errorLogs: any[] = [];
+
+/** 是否需要劫持该事件 */
+const isHijackEvent = (eventName: string) => {
+  return REPORT_CONFIG.reportEventName !== eventName && !REPORT_CONFIG.whiteEventNames.includes(eventName);
+};
 /**
  * 得到打印日志
  * @returns
@@ -66,7 +71,7 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
   addNativeEventLogs(data);
   nativeEventSubject.next(nativeEventLogs);
   /** 对上报事件不进行劫持，防止死循环 */
-  if (REPORT_CONFIG.reportEventName !== eventName && !REPORT_CONFIG.whiteEventNames.includes(eventName)) {
+  if (isHijackEvent(eventName)) {
     nativeEventSendBroadcast.next(data);
   }
   originalUniSendEvent(eventName, params, (...params: any[]) => {
@@ -74,7 +79,7 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     data.endTime = Date.now();
     nativeEventSubject.next(nativeEventLogs);
     /** 对上报事件不进行劫持，防止死循环 */
-    if (REPORT_CONFIG.reportEventName !== eventName) {
+    if (isHijackEvent(eventName)) {
       nativeEventResponseBroadcast.next(data);
     }
     callback(...params);
@@ -94,7 +99,7 @@ uni.onNativeEventReceive = (callback) => {
     };
     addNativeEventLogs(log);
     /** 对上报事件不进行劫持，防止死循环 */
-    if (REPORT_CONFIG.reportEventName !== event && !REPORT_CONFIG.whiteEventNames.includes(event)) {
+    if (isHijackEvent(event)) {
       nativeEventResponseBroadcast.next(log);
     }
     callback?.(event, data);
