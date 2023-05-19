@@ -6,6 +6,7 @@ import {
   nativeEventSendBroadcast,
   networkResponseBroadcast,
 } from './probe';
+import { formatDate } from './util';
 
 /** 日志类型 */
 enum LogType {
@@ -32,7 +33,11 @@ nativeEventResponseBroadcast.subscribe((data) => {
 networkResponseBroadcast.subscribe((data: any) => {
   /** 当有响应后，且响应的errno不是0，则上报日志 */
   if (data?.response && data.response.data?.errno !== 0) {
-    sendData(LogType.HTTP, data);
+    const params = { ...data };
+    if (data.respose?.statusCode === 403) {
+      params.token = uni.getStorageSync('token');
+    }
+    sendData(LogType.HTTP, params);
   }
 });
 
@@ -57,9 +62,8 @@ function sendData(type: LogType, data: any) {
       appVersion,
       appId,
       logType: type,
-      time: Date.now(),
+      time: formatDate(Date.now()),
       baseUrl: uni.getStorageSync('baseUrl'),
-      token: uni.getStorageSync('token'),
       userInfo: uni.getStorageSync('userInfo'),
       page: getCurrentPages?.()?.pop?.()?.route ?? '',
       data,
