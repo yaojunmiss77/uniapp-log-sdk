@@ -147,6 +147,6 @@ Object.defineProperty(uni, 'request', {
   },
 });
 
-uni.onError((...err: any[]) => {
+uni.onError?.((...err: any[]) => {
   addErrorLogs(err);
 });
