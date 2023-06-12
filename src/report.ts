@@ -30,6 +30,8 @@ networkResponseBroadcast.subscribe((data: any) => {
     const params = { ...data };
     if (data.respose?.statusCode === 403) {
       params.token = uni.getStorageSync('token');
+    } else {
+      delete params.request?.header?.Authorization;
     }
     sendData(LogType.HTTP, params);
   }
