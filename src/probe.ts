@@ -91,7 +91,9 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
   // #ifdef H5
   for (const [key, innerCallback] of eventNameToAppCallbacks.entries()) {
     if (key === eventName) {
-      innerCallback?.(params, callback);
+      setTimeout(() => {
+        innerCallback?.(params, callback);
+      }, 500);
     }
   }
   // #endif
