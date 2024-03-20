@@ -6,7 +6,9 @@ export const eventNameToAppCallbacks = new Map<string, (params: any, emit: (...p
  * @param callback 事件回调 params: 事件参数 emit: 事件回调，发送事件给小程序
  */
 export function mockAppOnEvent(eventName: string, callback: (params: any, emit: (...params: any[]) => void) => void) {
+  // #ifdef H5
   eventNameToAppCallbacks.set(eventName, callback);
+  // #endif
 }
 
 /**
@@ -14,5 +16,7 @@ export function mockAppOnEvent(eventName: string, callback: (params: any, emit: 
  * @param eventName 事件名称
  */
 export function mockAppOffEvent(eventName: string) {
+  // #ifdef H5
   eventNameToAppCallbacks.delete(eventName);
+  // #endif
 }
