@@ -3,6 +3,7 @@ import { IReportConfig } from './interface';
 
 export * from './probe';
 export * from './report';
+export * from './mock';
 
 export default {
   install(options: Partial<IReportConfig>) {

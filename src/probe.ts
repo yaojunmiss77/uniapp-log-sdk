@@ -1,5 +1,6 @@
 import { Subject } from 'rxjs';
 import { REPORT_CONFIG } from './constant';
+import { eventNameToAppCallbacks } from './mock';
 
 /** 对应多值 */
 export const consoleSubject = new Subject<any[]>();
@@ -84,6 +85,15 @@ uni.sendNativeEvent = (eventName, params, callback: (...params: any[]) => void) 
     }
     callback(...params);
   });
+  // #endif
+
+  /** 针对H5页面调试进行事件的mock调试 */
+  // #ifdef H5
+  for (const [key, innerCallback] of eventNameToAppCallbacks.entries()) {
+    if (key === eventName) {
+      innerCallback?.(params, callback);
+    }
+  }
   // #endif
 };
 const originalUniOnEvent = uni.onNativeEventReceive;
